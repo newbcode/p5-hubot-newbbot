@@ -16,6 +16,9 @@ sub load {
 sub hello {
     my $msg = shift;
 
+    my $sender = $msg->message->user->{name};
+    $msg->send($sender);
+
     my @fonts = qw/banner block big bubble digital ivrit lean mini mnemonic
         script shadow slant small smscript smshadow smslant standard term
         letter mini mnemonic smascii12 smascii9/;
