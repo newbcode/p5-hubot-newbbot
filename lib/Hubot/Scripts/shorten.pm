@@ -16,9 +16,6 @@ my $dbfile = 'shorten';
 my $dsn = "dbi::mysql::dbname=$dbfile";
 my $user = "";
 my $password = "";
-my $dbh;
-my $msg;
-my @row;
 
 sub load {
     my ( $class, $robot ) = @_;
@@ -26,7 +23,7 @@ sub load {
     $robot->hear(
         qr/(https?:\/\/\S+)/i,
         sub {
-            $msg   = shift;
+            my $msg  = shift;
             my $sender = $msg->message->user->{name};
             return if $sender eq 'hubot';
 
@@ -127,16 +124,23 @@ sub load {
                     mysql_enable_utf8 => 1,
                     });
 
+                my @row;
                 my $cron = AnyEvent::DateTime::Cron->new(time_zone => 'local');
-                    $cron->add('38 12 * * *', sub {
-                    my $t_time = `date`;
-                    $msg->send($t_time);
-                    my $sql = 'SELECT title, nickname FROM perlkr';
-                    my $sth = $dbh->prepare($sql);
-                    $sth->execute();
+                    $cron->add('*/1 * * * *', sub {
+                    my $today = `date '+%Y-%m-%d'`;
+                    my $am_s_today = "$today"."00:00";
+                    my $am_today = "$today"."12:00";
+                    my $pm_today = "$today"."17:30";
+
+                    $msg->send($today);
+                    #my $s_sql = 'SELECT title FROM perlkr';
+                    my $t_sql = 'SELECT title FROM perlkr WHERE created >= ? AND created <= ?';
+                    my $sth = $dbh->prepare($t_sql);
+                    #$sth->execute($am_s_today, $am_today);
+                    $sth->execute($am_today, $pm_today);
                     while ( @row = $sth->fetchrow_array) {
                         #$msg->send( "title: $row[0] nickname: $row[1]");
-                        $msg->send( "title: $row[0] nickname: $row[1]");
+                        $msg->send( "Today's Links - title: $row[0] ");
                     }
                 }); 
             $cron->start;
