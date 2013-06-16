@@ -9,12 +9,16 @@ use HTTP::Request;
 use LWP::UserAgent;
 use JSON::XS;
 use Encode 'decode';
+use Data::Printer;
+use AnyEvent::DateTime::Cron;
 
 my $dbfile = 'shorten';
 my $dsn = "dbi::mysql::dbname=$dbfile";
 my $user = "";
 my $password = "";
-
+my $dbh;
+my $msg;
+my @row;
 
 sub load {
     my ( $class, $robot ) = @_;
@@ -22,10 +26,10 @@ sub load {
     $robot->hear(
         qr/(https?:\/\/\S+)/i,
         sub {
-            my $msg   = shift;
-
-    
+            $msg   = shift;
             my $sender = $msg->message->user->{name};
+            return if $sender eq 'hubot';
+
             my $bitly = $msg->match->[0];
             if (   length $bitly > 50
                 && $ENV{HUBOT_BITLY_USERNAME}
@@ -97,18 +101,45 @@ sub load {
                     $title =~ s/(^\s+|\s+$)//g;
                     $msg->send("[$title] - $bitly");
 
+                    #
+                    # dbh 객체를 연결할때 utf8로 접속해야 하며 set names utf8로 설정해주어야 한다.
+                    #
                     my $dsn = "dbi:mysql:dbname=$dbfile";
                     my $dbh = DBI->connect($dsn, $user, $password, {
                     PrintError       => 0,
                     RaiseError       => 1,
                     AutoCommit       => 1,
                     FetchHashKeyName => 'NAME_lc',
+                    mysql_enable_utf8 => 1,
                     });
                     
-                   $dbh->do("INSERT INTO perlkr (nickname, url)
-                        VALUES (?, ?)", undef, $sender, $title);
+                    $dbh->do("set names 'utf8';");
+                    $dbh->do("INSERT INTO perlkr (nickname, title, url)
+                            VALUES (?, ?, ?)", undef, $sender, $title, $bitly);
                 }
               );
+                my $dsn = "dbi:mysql:dbname=$dbfile";
+                    my $dbh = DBI->connect($dsn, $user, $password, {
+                    PrintError       => 0,
+                    RaiseError       => 1,
+                    AutoCommit       => 1,
+                    FetchHashKeyName => 'NAME_lc',
+                    mysql_enable_utf8 => 1,
+                    });
+
+                my $cron = AnyEvent::DateTime::Cron->new(time_zone => 'local');
+                    $cron->add('38 12 * * *', sub {
+                    my $t_time = `date`;
+                    $msg->send($t_time);
+                    my $sql = 'SELECT title, nickname FROM perlkr';
+                    my $sth = $dbh->prepare($sql);
+                    $sth->execute();
+                    while ( @row = $sth->fetchrow_array) {
+                        #$msg->send( "title: $row[0] nickname: $row[1]");
+                        $msg->send( "title: $row[0] nickname: $row[1]");
+                    }
+                }); 
+            $cron->start;
         }
     );
 }

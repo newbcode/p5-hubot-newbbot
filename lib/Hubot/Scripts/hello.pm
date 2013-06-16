@@ -3,6 +3,7 @@ package Hubot::Scripts::hello;
 use utf8;
 use strict;
 use warnings;
+use Text::FIGlet;
 
 sub load {
     my ( $class, $robot ) = @_;
@@ -17,7 +18,6 @@ sub hello {
     my $msg = shift;
 
     my $sender = $msg->message->user->{name};
-    $msg->send($sender);
 
     my @fonts = qw/banner block big bubble digital ivrit lean mini mnemonic
         script shadow slant small smscript smshadow smslant standard term
@@ -27,9 +27,10 @@ sub hello {
 
     my $num = int( rand(21) );
 
-    my $msg1 = `figlet -f $fonts[$num] $user_input`;
+    my $font = Text::FIGlet->new(-d=>"/usr/share/figlet", -f=>"$fonts[$num]");
+    my $text = $font->figify(-A=>"$user_input");
     $msg->send("Font is $fonts[$num]!!!!!!!!!!!!");
-    $msg->send( split (/\n/, $msg1) );
+    $msg->send( split (/\n/, $text) );
 }
 
 1;
