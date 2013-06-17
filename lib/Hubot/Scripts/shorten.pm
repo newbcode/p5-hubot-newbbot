@@ -25,7 +25,8 @@ sub load {
         sub {
             my $msg  = shift;
             my $sender = $msg->message->user->{name};
-            return if $sender eq 'hubot';
+
+            return if $sender eq 'hongbot';
 
             my $bitly = $msg->match->[0];
             if (   length $bitly > 50
@@ -96,7 +97,7 @@ sub load {
                     $title = 'no title' unless $title;
                     $title =~ s/\n//g;
                     $title =~ s/(^\s+|\s+$)//g;
-                    $msg->send("[$title] - $bitly");
+                    #$msg->send("[$title] - $bitly");
 
                     #
                     # dbh 객체를 연결할때 utf8로 접속해야 하며 set names utf8로 설정해주어야 한다.
