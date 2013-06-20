@@ -28,7 +28,6 @@ sub hello {
 
     my $font = Text::FIGlet->new(-d=>"./figlet", -f=>"$fonts[$num]");
     my $text = $font->figify(-A=>"$user_input");
-    $msg->send("Font is $fonts[$num]!!!!!!!!!!!!");
     $msg->send( split (/\n/, $text) );
 }
 
@@ -42,7 +41,7 @@ sub hello {
  
 =head1 SYNOPSIS
 
-    hello <text> - Random show text in ascii art
+    hello <text> - Random text show in ascii
  
 =head1 AUTHOR
 
