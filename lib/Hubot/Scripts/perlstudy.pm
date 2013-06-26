@@ -20,7 +20,7 @@ sub load {
             my $user_input = $msg->match->[0];
             $msg->send('naver cafe(perlstudy) to start monitoring ...');
 
-            $cron->add ( '*/1 * * * *' => sub {
+            $cron->add ( '*/59 * * * *' => sub {
                     $msg->http("http://cafe.rss.naver.com/perlstudy")->get(
                         sub {
                             my ( $body, $hdr ) = @_;
