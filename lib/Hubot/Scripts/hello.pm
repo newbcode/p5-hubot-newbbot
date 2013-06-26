@@ -58,7 +58,7 @@ sub hello_list {
 =head1 SYNOPSIS
 
     hello <text> - Random text show in ascii
-    hello <list> - Ascii Fonts List
+    hello - list - Ascii Fonts List
  
 =head1 AUTHOR
 

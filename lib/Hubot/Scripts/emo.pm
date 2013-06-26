@@ -61,7 +61,9 @@ sub emo_process {
  
 =head1 SYNOPSIS
 
-    emo <emoticon name> - Show Emoticons
+ascii emoticons  - This is not command. 
+
+Show the random emoticons.
  
 =head1 AUTHOR
 
