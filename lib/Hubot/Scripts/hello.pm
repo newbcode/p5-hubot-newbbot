@@ -12,6 +12,10 @@ sub load {
         qr/^hello (.+)/i,    
         \&hello,
     );
+    $robot->hear(
+        qr/^hello list$/i,
+        \&hello_list,
+    );
 }
 
 sub hello {
@@ -28,7 +32,19 @@ sub hello {
 
     my $font = Text::FIGlet->new(-d=>"./figlet", -f=>"$fonts[$num]");
     my $text = $font->figify(-A=>"$user_input");
-    $msg->send( split (/\n/, $text) );
+    $msg->send( split (/\n/, $text) ) if $user_input ne 'list';
+}
+
+sub hello_list {
+    my $msg = shift;
+
+    my $sender = $msg->message->user->{name};
+
+    my @fonts = qw/banner block big bubble digital ivrit lean mini mnemonic
+        script shadow slant small smscript smshadow smslant standard term/;
+    my $s_fonts = join ('/ ', @fonts);
+
+    $msg->send('List of available asciifonts - '. $s_fonts );
 }
 
 1;
@@ -42,6 +58,7 @@ sub hello {
 =head1 SYNOPSIS
 
     hello <text> - Random text show in ascii
+    hello <list> - Ascii Fonts List
  
 =head1 AUTHOR
 
