@@ -1,7 +1,7 @@
 # p5-hubot-newbbot #
 
-![p5-hubot](https://github.com/aanoaa/p5-hubot)
-Hubot IRC 기반의 스크립트 모음
+[p5-hubot](https://github.com/aanoaa/p5-hubot)
+Hubot IRC 기반의 스크립트 모음.
 git hubot을 aanoaa님이 perl로 porting 해주신것을 기반으로 만들어진 hubot scripts입니다.
 
 ## Installation ##
