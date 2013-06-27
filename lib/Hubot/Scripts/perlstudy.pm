@@ -20,7 +20,7 @@ sub load {
             my $user_input = $msg->match->[0];
             $msg->send('naver cafe(perlstudy) to start monitoring ...');
 
-            $cron->add ( '*/59 * * * *' => sub {
+            $cron->add ( '*/10 * * * *' => sub {
                     $msg->http("http://cafe.rss.naver.com/perlstudy")->get(
                         sub {
                             my ( $body, $hdr ) = @_;
@@ -49,6 +49,8 @@ sub load {
                             if ( $new_titles[0] eq $robot->brain->{data}{olde_titles}->[0]) {
                             }
                             else {
+                                my $date = `date`;
+                                $msg->send($date);
                                 $msg->send('카페(perlstudy)에 새로운 질문(댓글)이 올라왔습니다');
                                 $msg->send('-> ' . "$new_titles[0]");
                                 $robot->brain->{data}{old_titles} = \@titles;
