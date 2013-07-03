@@ -31,8 +31,6 @@ sub load {
                             my @titles = $decode_body =~ m{<!\[CDATA\[(.*?)\]\]>}gsm;
                             my @urls = $decode_body =~ m{<link>(.*?)</link>}gsm;
                             my @times = $decode_body =~ m{<pubDate>(.*?) \+0900</pubDate>}gsm;
-                            p @urls;
-                            p @titles;
 
                             my @new_titles;
                             my @new_urls;
