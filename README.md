@@ -12,9 +12,11 @@ Hubot IRC 기반의 스크립트 모음.
 
 ## newbbot scripts ##
 
-1. hello - Show random ascii.
-2. emo - Show random ascii fonts.
-3. perlstudy - Naver perl cafe(perlstudy) monitoring.
+        1. hello - Show random ascii.
+        2. emo - Show random ascii fonts.
+        3. perlstudy - Naver perl cafe(perlstudy) monitoring.
+        4. kma - Korea Meteorological Administration provides information to the script
+        5. weather - Returns weather information from Yahoo Weather APIs!
 
 ## Configuration ##
 
