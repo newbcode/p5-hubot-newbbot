@@ -21,50 +21,35 @@ sub load {
             my $user_input = $msg->match->[0];
             $msg->send('It has been started monitoring [cafe-perlstudy]...');
 
-            $cron->add ( '*/10 * * * *' => sub {
-                    $msg->http("http://cafe.rss.naver.com/perlstudy")->get(
+           $cron->add ( '*/10 * * * *' => sub {
+                    $msg->http("http://cafe.naver.com/MyCafeIntro.nhn?clubid=18062050")->get(
                         sub {
                             my ( $body, $hdr ) = @_;
                             return if ( !$body || $hdr->{Status} !~ /^2/ );
 
-                            my $decode_body = decode ("utf8", $body);
-                            my @titles = $decode_body =~ m{<!\[CDATA\[(.*?)\]\]>}gsm;
-                            my @urls = $decode_body =~ m{<link>(.*?)</link>}gsm;
-                            my @times = $decode_body =~ m{<pubDate>(.*?) \+0900</pubDate>}gsm;
+                            my $decode_body = decode ("euc-kr", $body);
 
-                            my @new_titles;
-                            my @new_urls;
-                            my $cnt = 0;
+                            my @titles = $decode_body =~ m{<a href="/ArticleRead.nhn\?clubid=18062050&articleid=\w+&referrerAllArticles=true" class="m-tcol-c" title="(.*?)">}gsm;
+                            my @urls = $decode_body =~ m{<a href="/ArticleRead.nhn\?clubid=18062050&articleid=(\w+)&referrerAllArticles=true" class="m-tcol-c" title=".*?">}gsm;
+                            my @times = $decode_body =~ m{<\!-- 전체 목록 보기에서 질문 답변 게시판의 게시물인 경우 앞에 Q\.를 붙인다 -->.*?<td class="m-tcol-c">(.*?)</td>}gsm;
+                            my @quests = $decode_body =~ m{<\!-- 전체 목록 보기에서 질문 답변 게시판의 게시물인 경우 앞에 Q\.를 붙인다 -->.*?<div class="ellipsis m-tcol-c">(.*?)</div>}gsm;
+                            my @strongs = $decode_body =~ m{<\!-- 전체 목록 보기에서 질문 답변 게시판의 게시물인 경우 앞에 Q\.를 붙인다 -->.*?<strong>(.*?)</strong>}gsm;
 
                             if ( $robot->brain->{data}{old_titles} ) {
-                                for my $title (@titles) {
-                                    unless ( $title eq $robot->brain->{data}{old_titles}->[$cnt] ) {
-                                        push @new_titles, $title;
-                                    }
-                                $cnt++;
-                                }
-                                for my $url (@urls) {
-                                    unless ( $url eq $robot->brain->{data}{old_urls}->[$cnt] ) {
-                                        push @new_urls, $url;
-                                    }
-                                $cnt++;
+                                unless( $titles[0] eq $robot->brain->{data}{old_titles}->[0]) {
+                                    $msg->send('카페(perlstudy)에 새로운 질문(댓글)이 올라왔습니다');
+                                    $msg->send("제목:[$titles[0]]"." 등록자:[$quests[0]]"." 등록시간:[$times[0]]" );
+                                    $msg->send("바로가기->http://http://cafe.naver.com/perlstudy/$urls[0]");
+                                    $robot->brain->{data}{old_titles} = \@titles;
                                 }
                             }
 
                             else {
                                 $robot->brain->{data}{old_titles} = \@titles;
+                                $robot->brain->{data}{old_urls} = \@urls;
                                 $robot->brain->{data}{old_times} = \@times;
-                                $robot->brain->{data}{old_urls} = \@urls;
-                            }
-
-                            if ( $new_titles[0] eq $robot->brain->{data}{olde_titles}->[0]) {
-                            }
-                            else {
-                                $msg->send('카페(perlstudy)에 새로운 질문(댓글)이 올라왔습니다');
-                                $msg->send('-> ' . "$new_titles[0]");
-                                $msg->send('Link: ' . "$new_urls[1]");
-                                $robot->brain->{data}{old_titles} = \@titles;
-                                $robot->brain->{data}{old_urls} = \@urls;
+                                $robot->brain->{data}{old_quests} = \@quests;
+                                $robot->brain->{data}{old_strongs} = \@strongs;
                             }
                         }
                     );
