@@ -1,4 +1,5 @@
 package Hubot::Scripts::weather;
+# ABSTRACT: Weather Script for Hubot. 
 
 use utf8;
 use strict;
@@ -11,21 +12,35 @@ sub load {
     my ( $class, $robot ) = @_;
  
     $robot->hear(
-        qr/^forecast (.+) (.+)/i,    
+        qr/^forecast (.+)/i,    
         \&forecast_process,
     );
     $robot->hear(
         qr/^weather (.+)/i,    
         \&current_process,
     );
+    $robot->hear(
+        qr/^@(.+)/i,    
+        \&current_process,
+    );
+    $robot->hear(
+        qr/@(\d+\.\d+\.\d+\.\d+$)/i,    
+        #qr/\.*?@(\d+\.\d+\.\d+\.\d+)\) has joined \#perl\-kr/i,    
+        \&parser_ip,
+    );
+=pod
+    $robot->hear(
+        qr/^(\d+\.\d+\.\d+\.\d+)/i,    
+        \&station,
+    );
+=cut
 }
 
 sub forecast_process {
     my $msg = shift;
     my $user_country = $msg->match->[0];
-    my $user_distric = $msg->match->[1];
 
-    my $woeid = woeid_process($msg, $user_country, $user_distric);
+    my $woeid = woeid_process($msg, $user_country);
 
     if ( $woeid =~ /^\d+/) {
         my @weekly = condition_process($woeid, 'weekly');
@@ -43,9 +58,8 @@ sub forecast_process {
 sub current_process {
     my $msg = shift;
     my $user_country = $msg->match->[0];
-    my $user_distric = $msg->match->[1];
 
-    my $woeid = woeid_process($msg, $user_country, $user_distric);
+    my $woeid = woeid_process($msg, $user_country);
 
     if ( $woeid =~ /^\d+/) {
         my %current = condition_process($woeid, 'current');
@@ -130,14 +144,38 @@ sub woeid_process {
     }
 }
 
+sub station {
+    my $msg = shift;
+    my $user_ip = $msg->match->[0];
+
+    $msg->http("http://www.ip2location.com/$user_ip")->get (
+        sub {
+            my ($body, $hdr) = @_;
+
+            return if ( !$body || $hdr->{Status} !~ /^2/ );
+
+            my $decoded_body = decode("utf8", $body);
+            p $user_ip;
+                if ( $decoded_body =~ m{<td><b>Weather Station</b></td>.*?<td>(.*?)</td>}gsm ) {
+                    print $1;
+                }
+            }
+        );
+}
+
+sub parser_ip {
+    my $msg = shift;
+    my $sender = $msg->message->user->{name};
+    my $join_ip = $msg->match->[0];
+
+    print "$join_ip\n";
+    print "$sender\n";
+}
+
 1;
 
 =pod
 
-=head1 Name 
-
-    Hubot::Scripts::weather
- 
 =head1 SYNOPSIS
 
     Returns weather information from Yahoo Weather APIs!
@@ -145,8 +183,4 @@ sub woeid_process {
     weather <country> <city> - View current local area weather information. (ex: weather <south korea> <kangnam>)
     forecast <country> <city> - View local weather forecast information. (ex: weather <south korea> <kangnam>) 
 
-=head1 AUTHOR
-
-    YunChang Kang <codenewb@gmail.com>
- 
 =cut

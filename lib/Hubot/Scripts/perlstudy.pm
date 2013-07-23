@@ -39,7 +39,7 @@ sub load {
                                 unless( $titles[0] eq $robot->brain->{data}{old_titles}->[0]) {
                                     $msg->send('카페(perlstudy)에 새로운 질문(댓글)이 올라왔습니다');
                                     $msg->send("제목:[$titles[0]]"." 등록자:[$quests[0]]"." 등록시간:[$times[0]]" );
-                                    $msg->send("바로가기->http://http://cafe.naver.com/perlstudy/$urls[0]");
+                                    $msg->send("바로가기->http://cafe.naver.com/perlstudy/$urls[0]");
                                     $robot->brain->{data}{old_titles} = \@titles;
                                 }
                             }
