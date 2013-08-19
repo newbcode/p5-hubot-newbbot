@@ -17,6 +17,7 @@ Hubot IRC 기반의 스크립트 모음.
         3. perlstudy - Naver perl cafe(perlstudy) monitoring.
         4. kma - Korea Meteorological Administration provides information to the script
         5. weather - Returns weather information from Yahoo Weather APIs!
+        6. memo - IRC CHATROOT memobot.
 
 ## Configuration ##
 
