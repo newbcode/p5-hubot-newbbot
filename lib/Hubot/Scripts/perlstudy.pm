@@ -58,6 +58,7 @@ sub load {
                             if ( $robot->brain->{data}{old_reps} ) {
                                 my $cnt = 0;
                                 foreach my $rep ( @reps ) {
+                                    last if $rep == '0';
                                     unless ( $rep eq $robot->brain->{data}{old_reps}->[$cnt] ) {
                                         $msg->send('카페(perlstudy)에 새로운 답변이 등록 되었습니다.');
                                         $msg->send("제목:[$titles[$cnt]]"." 등록자:[$quests[$cnt]]"." 등록시간:[$times[$cnt]]" );

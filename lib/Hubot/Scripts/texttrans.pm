@@ -51,7 +51,7 @@ sub load {
  
 =head1 SYNOPSIS
 
-    s/<regexp>/<replacement>/ - Search for a character, and then are replaced.
+    s/<before_word>/<after_word>/ - Search for a character, and then are replaced.
 
 =head1 AUTHOR
 

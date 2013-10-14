@@ -10,7 +10,7 @@ sub load {
     my ( $class, $robot ) = @_;
  
     $robot->hear(
-        qr/(화남|머리아픔|맥주|도망|ping|pong|행복|좀비|댄스|슬픔|사랑|발자국|헬로우|음악|와우|폭격|일출)/i,    
+        qr/^emo (.+)/i,    
         \&emo_process,
     );
 }
@@ -30,21 +30,9 @@ sub emo_process {
     my $flag = 'off';
     for my $emo_key ( @emos ) {
         if ( $user_input eq $emo_key ) {
-            if ( $user_input eq 'ping') {
-                $msg->send( split (/\n/, $$emoref{$emo_key}) );
-                $msg->send( $sender );
-                $flag = 'on';
-            }
-            elsif ( $user_input eq 'pong') {
-                $msg->send( split (/\n/, $$emoref{$emo_key}) );
-                $msg->send( '                          '."$sender" );
-                $flag = 'on';
-            }
-
-            else {
-                $msg->send( split (/\n/, $$emoref{$emo_key}) );
-                $flag = 'on';
-            }
+            $msg->send('--------------' .  $sender . '\'s emoticon' . '--------------');
+            $msg->send( split (/\n/, $$emoref{$emo_key}) );
+            $flag = 'on';
         }
     }
     my $able = join '/ ', @emos;
@@ -61,9 +49,7 @@ sub emo_process {
  
 =head1 SYNOPSIS
 
-ascii emoticons  - This is not command. 
-
-Show the random emoticons.
+    emo <emoticon name> - Show Emoticons
  
 =head1 AUTHOR
 
